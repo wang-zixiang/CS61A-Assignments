@@ -13,6 +13,7 @@ GOAL = 100  # The goal of Hog is to score 100 points.
 def roll_dice(num_rolls, dice=six_sided):
     """Simulate rolling the DICE exactly NUM_ROLLS > 0 times. Return the sum of
     the outcomes unless any of the outcomes is 1. In that case, return 1.
+    如果dice扔到1，就返回1，否则返回所有的和
 
     num_rolls:  The number of dice rolls that will be made.
     dice:       A function that simulates a single dice roll outcome. Defaults to the six sided dice.
@@ -22,6 +23,19 @@ def roll_dice(num_rolls, dice=six_sided):
     assert num_rolls > 0, 'Must roll at least once.'
     # BEGIN PROBLEM 1
     "*** YOUR CODE HERE ***"
+    one_appeared = False
+    score = 0
+    for _ in range(num_rolls):
+        outcome = dice()
+        if outcome == 1:
+            score = 1
+            one_appeared = True
+        else:
+            score += outcome
+    if one_appeared == True:
+        return 1
+    else:
+        return score
     # END PROBLEM 1
 
 
@@ -34,12 +48,18 @@ def boar_brawl(player_score, opponent_score):
     """
     # BEGIN PROBLEM 2
     "*** YOUR CODE HERE ***"
+    tens = (opponent_score // 10) % 10
+    ones = (player_score % 10)
+    points = abs(tens - ones) * 3
+    return max(points, 1)
+
     # END PROBLEM 2
 
 
 def take_turn(num_rolls, player_score, opponent_score, dice=six_sided):
     """Return the points scored on a turn rolling NUM_ROLLS dice when the
     player has PLAYER_SCORE points and the opponent has OPPONENT_SCORE points.
+    根据上面两个函数返回一个分数
 
     num_rolls:       The number of dice rolls that will be made.
     player_score:    The total score of the current player.
@@ -52,6 +72,12 @@ def take_turn(num_rolls, player_score, opponent_score, dice=six_sided):
     assert num_rolls <= 10, 'Cannot roll more than 10 dice.'
     # BEGIN PROBLEM 3
     "*** YOUR CODE HERE ***"
+    score = 0
+    if(num_rolls == 0):
+        score = boar_brawl(player_score, opponent_score)
+    else:
+        score = roll_dice(num_rolls, dice)
+    return score
     # END PROBLEM 3
 
 
@@ -77,12 +103,22 @@ def num_factors(n):
     """Return the number of factors of N, including 1 and N itself."""
     # BEGIN PROBLEM 4
     "*** YOUR CODE HERE ***"
+    num, i= 0, 1 
+    while(n >= i):
+        if n % i == 0:
+            num += 1
+        i += 1
+    return num
     # END PROBLEM 4
 
 def sus_points(score):
     """Return the new score of a player taking into account the Sus Fuss rule."""
     # BEGIN PROBLEM 4
     "*** YOUR CODE HERE ***"
+    if(num_factors(score) == 3 or num_factors(score) == 4):
+        while(not is_prime(score)):
+            score += 1
+    return score
     # END PROBLEM 4
 
 def sus_update(num_rolls, player_score, opponent_score, dice=six_sided):
@@ -91,6 +127,9 @@ def sus_update(num_rolls, player_score, opponent_score, dice=six_sided):
     """
     # BEGIN PROBLEM 4
     "*** YOUR CODE HERE ***"
+    score = simple_update(num_rolls, player_score, opponent_score, dice)
+    score = sus_points(score)
+    return score
     # END PROBLEM 4
 
 
@@ -130,6 +169,15 @@ def play(strategy0, strategy1, update,
     who = 0  # Who is about to take a turn, 0 (first) or 1 (second)
     # BEGIN PROBLEM 5
     "*** YOUR CODE HERE ***"
+    while score0 < goal and score1 < goal:
+        if who == 0:
+            num_rolls = strategy0(score0, score1)
+            score0 = update(num_rolls, score0, score1, dice)
+        else:
+            num_rolls = strategy1(score1, score0)
+            score1 = update(num_rolls, score1, score0, dice)
+        who = 1 - who
+            
     # END PROBLEM 5
     return score0, score1
 
@@ -155,6 +203,9 @@ def always_roll(n):
     assert n >= 0 and n <= 10
     # BEGIN PROBLEM 6
     "*** YOUR CODE HERE ***"
+    def strategy(player_score, opponent_score):
+        return n
+    return strategy
     # END PROBLEM 6
 
 
@@ -185,7 +236,14 @@ def is_always_roll(strategy, goal=GOAL):
     False
     """
     # BEGIN PROBLEM 7
-    "*** YOUR CODE HERE ***"
+    "*** YOUR CODE HERE ***"    
+    first_score = strategy(0, 0)
+
+    for player_score in range(goal):
+        for opponent_score in range (goal):
+            if strategy(player_score, opponent_score) != first_score:
+                return False
+    return True
     # END PROBLEM 7
 
 
@@ -202,6 +260,13 @@ def make_averaged(original_function, times_called=1000):
     """
     # BEGIN PROBLEM 8
     "*** YOUR CODE HERE ***"
+    def average(*args):
+        total = 0
+        for i in range(times_called):
+            result = original_function(*args)
+            total += result
+        return total/times_called
+    return average 
     # END PROBLEM 8
 
 
@@ -215,6 +280,11 @@ def max_scoring_num_rolls(dice=six_sided, times_called=1000):
     """
     # BEGIN PROBLEM 9
     "*** YOUR CODE HERE ***"
+    ans = 0
+    for i in range (1, 11):
+        if (make_averaged(i, times_called) > make_averaged(i - 1) and i >= 1):
+            ans = i
+    return ans        
     # END PROBLEM 9
 
 
@@ -259,6 +329,10 @@ def boar_strategy(score, opponent_score, threshold=11, num_rolls=6):
     points, and returns NUM_ROLLS otherwise. Ignore score and Sus Fuss.
     """
     # BEGIN PROBLEM 10
+    tens = (opponent_score // 10) % 10
+    ones = score % 10
+    if abs(tens - ones) * 3 >= threshold:
+        return 0
     return num_rolls  # Remove this line once implemented.
     # END PROBLEM 10
 
@@ -266,16 +340,24 @@ def boar_strategy(score, opponent_score, threshold=11, num_rolls=6):
 def sus_strategy(score, opponent_score, threshold=11, num_rolls=6):
     """This strategy returns 0 dice when your score would increase by at least threshold."""
     # BEGIN PROBLEM 11
+    if num_rolls == 0:
+        return boar_strategy(score, opponent_score, threshold, )
     return num_rolls  # Remove this line once implemented.
     # END PROBLEM 11
 
 
 def final_strategy(score, opponent_score):
     """Write a brief description of your final strategy.
+    策略一：如果扔0可以直接胜利，必须扔0
 
     *** YOUR DESCRIPTION HERE ***
     """
-    # BEGIN PROBLEM 12
+    # BEGIN PROBLEM 12 
+    boar_score = boar_brawl(score, opponent_score)
+    if boar_score + score >= 100:
+        return 0
+    if score - opponent_score >= 15:
+        return 0
     return 6  # Remove this line once implemented.
     # END PROBLEM 12
 

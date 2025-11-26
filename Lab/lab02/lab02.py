@@ -14,10 +14,16 @@ def composite_identity(f, g):
     False
     """
     "*** YOUR CODE HERE ***"
+    def function_equal(x):
+        if(f(g(x)) == g(f(x))):
+            return True
+        else:
+            return False
+    return function_equal
 
 
 def sum_digits(y):
-    """Return the sum of the digits of non-negative integer y."""
+    """返回所有位数上数字之和."""
     total = 0
     while y > 0:
         total, y = total + y % 10, y // 10
@@ -60,6 +66,13 @@ def count_cond(condition):
     8
     """
     "*** YOUR CODE HERE ***"
+    def cond(n):
+        ans = 0
+        for i in range(1, n + 1):
+            if(condition(n, i)):
+                ans = ans + 1
+        return ans
+    return 1
 
 
 def multiple(a, b):
@@ -71,6 +84,13 @@ def multiple(a, b):
     42
     """
     "*** YOUR CODE HERE ***"
+    ans = max(a, b)
+    while True:
+        if(ans % a == 0 and ans % b == 0):
+            return ans
+        else:
+            ans += 1
+
 
 
 
@@ -101,4 +121,18 @@ def cycle(f1, f2, f3):
     19
     """
     "*** YOUR CODE HERE ***"
+    def my_cycle(n):
+        def get_parameter(x):
+            ans = x
+            func_list = [f1,f2,f3]
+            for i in range(n):
+                ans = func_list[i % 3](ans)
+                # current_func = func_list[i % 3]
+                # ans = current_func(ans)
+            return ans
+        return get_parameter
+    return my_cycle
+
+            
+
 

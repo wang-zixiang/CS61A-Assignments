@@ -25,6 +25,15 @@ def num_eights(n):
     True
     """
     "*** YOUR CODE HERE ***"
+    if n == 8:
+        return 1
+    elif n < 10 and n != 8:
+        return 0
+    else:
+        if n % 10 == 8:
+            return 1 + num_eights(n // 10)
+        else:
+            return num_eights(n // 10)
 
 
 def digit_distance(n):
@@ -47,7 +56,11 @@ def digit_distance(n):
     True
     """
     "*** YOUR CODE HERE ***"
-
+    if n < 10:
+        return 0
+    first = n % 10
+    second = n  // 10 % 10
+    return abs(first - second) + digit_distance(n // 10)
 
 def interleaved_sum(n, odd_func, even_func):
     """Compute the sum odd_func(1) + even_func(2) + odd_func(3) + ..., up
@@ -71,6 +84,12 @@ def interleaved_sum(n, odd_func, even_func):
     True
     """
     "*** YOUR CODE HERE ***"
+    def helper(k, current_func, next_func):
+        if k > n:
+            return 0 
+        else:
+            return helper(k + 1, next_func, current_func) + current_func(k)
+    return helper(1, odd_func, even_func)
 
 
 def next_smaller_dollar(bill):
@@ -107,6 +126,20 @@ def count_dollars(total):
     True
     """
     "*** YOUR CODE HERE ***"
+    # if total == 1:
+    #     return 1
+    # else:
+    #     return count_dollars(next_smaller_dollar) * count_dollars(total - next_smaller_dollar)
+    #amount:剩余的带凑的钱数，bill当前最大的面额
+    def count_dollars(amount, bill):
+        if amount == 0:
+            return 1
+        elif amount < 0 or bill is None:
+            return 0
+        with_bill = count_dollars(amount - bill, bill)
+        without_bill = count_dollars(amount, next_smaller_dollar(bill))
+        return with_bill + without_bill
+    return count_dollars(total, 100)
 
 
 def next_larger_dollar(bill):
@@ -143,7 +176,15 @@ def count_dollars_upward(total):
     True
     """
     "*** YOUR CODE HERE ***"
-
+    def count_dollars(amount, bill):
+        if amount == 0 : 
+            return 1
+        elif amount < 0 or bill == None:
+            return 0
+        with_bill = count_dollars(amount - bill, bill)
+        without_bill = count_dollars(amount, next_larger_dollar(bill))
+        return with_bill + without_bill
+    return count_dollars(total, 1)
 
 def print_move(origin, destination):
     """Print instructions to move a disk."""
@@ -178,6 +219,13 @@ def move_stack(n, start, end):
     """
     assert 1 <= start <= 3 and 1 <= end <= 3 and start != end, "Bad start/end"
     "*** YOUR CODE HERE ***"
+    if n == 1:
+        print_move(start, end)
+    else:
+        other = 6 - start - end
+        move_stack(n - 1, start, other)
+        print_move(start, end)
+        move_stack(n - 1, other, end)
 
 
 from operator import sub, mul
@@ -193,5 +241,5 @@ def make_anonymous_factorial():
     ...     ['Assign', 'AnnAssign', 'AugAssign', 'NamedExpr', 'FunctionDef', 'Recursion'])
     True
     """
-    return 'YOUR_EXPRESSION_HERE'
+    return (lambda f : f(f))(lambda self : lambda n : 1 if n == 1 else n * self(self)(n - 1))
 
