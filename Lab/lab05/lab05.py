@@ -28,6 +28,12 @@ def insert_items(s, before, after):
     """
     "*** YOUR CODE HERE ***"
 
+    nums = 0
+    for i in range(len(s)):
+        if s[i + nums] == before:
+            s.insert(i + nums + 1, after)
+            nums += 1
+    return s
 
 def group_by(s, fn):
     """Return a dictionary of lists that together contain the elements of s.
@@ -40,12 +46,12 @@ def group_by(s, fn):
     {9: [-3, 3], 4: [-2, 2], 1: [-1, 1], 0: [0]}
     """
     grouped = {}
-    for ____ in ____:
-        key = ____
+    for i in s:
+        key = fn(i)
         if key in grouped:
-            ____
+            grouped[key].append(i)
         else:
-            grouped[key] = ____
+            grouped[key] = [i]
     return grouped
 
 
@@ -71,6 +77,13 @@ def count_occurrences(t, n, x):
     2
     """
     "*** YOUR CODE HERE ***"
+    num = 0
+    for i in range(n):
+        element = next(t)
+        if element == x:
+            num += 1
+    return num
+        
 
 
 def repeated(t, k):
@@ -94,6 +107,21 @@ def repeated(t, k):
     """
     assert k > 1
     "*** YOUR CODE HERE ***"
+    before = 0
+    count = 1
+    element = next(t)
+    while(1):
+        next_element = next(t)
+        # print(f"追踪当前值：{element}, 下一个值：{next_element}" )
+
+        if next_element == element:
+            count += 1 
+            if count == k:
+                return element
+
+        else:
+            count = 1
+        element = next_element
 
 
 def sprout_leaves(t, leaves):
@@ -130,7 +158,13 @@ def sprout_leaves(t, leaves):
           2
     """
     "*** YOUR CODE HERE ***"
-
+    if is_leaf(t):
+        new_branches = [tree(leaf_label) for leaf_label in leaves]
+        return tree(label(t), new_branches)
+    
+    else:
+        new_branches = [sprout_leaves(b, leaves) for b in branches(t)]
+        return tree(label(t), new_branches)
 
 def partial_reverse(s, start):
     """Reverse part of a list in-place, starting with start up to the end of
@@ -144,8 +178,11 @@ def partial_reverse(s, start):
     >>> a
     [1, 2, 7, 6, 5, 3, 4]
     """
-    "*** YOUR CODE HERE ***"
-
+    end = len(s) - 1
+    while start < end:
+        s[start], s[end] = s[end], s[start]
+        start += 1
+        end -= 1
 
 
 # Tree Data Abstraction

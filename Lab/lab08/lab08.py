@@ -12,6 +12,10 @@ def cumulative_mul(t):
     Tree(5040, [Tree(60, [Tree(3), Tree(4), Tree(5)]), Tree(42, [Tree(7)])])
     """
     "*** YOUR CODE HERE ***"
+    #首先对所有的子节点进行处理
+    for b in t.branches:
+        cumulative_mul(b)
+        t.label = t.label * b.label
 
 
 def prune_small(t, n):
@@ -31,11 +35,11 @@ def prune_small(t, n):
     >>> t3
     Tree(6, [Tree(1), Tree(3, [Tree(1), Tree(2)])])
     """
-    while ____:
-        largest = max(____, key=____)
+    while len(t.branches) > n:
+        largest = max(t.branches, key = lambda b : b.label)
         t.branches.remove(largest)
     for b in t.branches:
-        ____
+        prune_small(b, n)
 
 
 def delete(t, x):
@@ -58,13 +62,14 @@ def delete(t, x):
     Tree(1, [Tree(4), Tree(5), Tree(3, [Tree(6)]), Tree(6), Tree(7), Tree(8), Tree(4)])
     """
     new_branches = []
-    for _________ in ________________:
-        _______________________
+    for b in t.branches:
+        delete(b, x)
+
         if b.label == x:
-            __________________________________
+            new_branches.extend(b.branches)
         else:
-            __________________________________
-    t.branches = ___________________
+            new_branches.append(b)
+    t.branches = new_branches
 
 
 def max_path_sum(t):
@@ -75,6 +80,22 @@ def max_path_sum(t):
     11
     """
     "*** YOUR CODE HERE ***"
+    # #1.循环版
+    # if t.is_leaf():
+    #     return t.label
+    # highest_child_sum = -float('inf')
+    # for b in t.branches:
+    #     child_sum = max_path_sum(b)
+        
+    #     if child_sum > highest_child_sum:
+    #         highest_child_sum = child_sum
+    # return t.label + highest_child_sum
+
+    #递归版
+    if t.is_leaf():
+        return t.label
+
+    return t.label + max([max_path_sum(b) for b in t.branches])
 
 
 class Tree:

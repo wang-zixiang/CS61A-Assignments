@@ -37,11 +37,16 @@ class Account:
         return self.balance
 
     def time_to_retire(self, amount):
-        """Return the number of years until balance would grow to amount."""
+        """返回余额增长到该金额所需的年数."""
         assert self.balance > 0 and amount > 0 and self.interest > 0
         "*** YOUR CODE HERE ***"
-
-
+        temp = self.balance
+        ans = 0
+        while temp < amount:
+            temp *= (1 + self.interest)
+            ans += 1
+        return ans
+    
 class FreeChecking(Account):
     """A bank account that charges for withdrawals, but the first two are free!
 
@@ -68,8 +73,23 @@ class FreeChecking(Account):
     """
     withdraw_fee = 1
     free_withdrawals = 2
-
     "*** YOUR CODE HERE ***"
+    def __init__(self, account_holder):
+        super().__init__(account_holder)
+        self.withdraw_times = 0
+    
+    def withdraw(self, amount):
+        self.withdraw_times += 1
+
+        fee = 0
+        if self.withdraw_times > self.free_withdrawals:
+            fee  = self.withdraw_fee
+
+        total_amount = amount + fee
+
+        return super().withdraw(total_amount)
+
+
 
 
 def without(s, i):
@@ -86,6 +106,13 @@ def without(s, i):
     True
     """
     "*** YOUR CODE HERE ***"
+    if s is Link.empty:
+        return Link.empty
+    
+    if i == 0:
+        return s.rest
+    
+    return Link(s.first, without(s.rest, i - 1))
 
 
 def duplicate_link(s, val):
@@ -105,7 +132,17 @@ def duplicate_link(s, val):
     Link(1, Link(2, Link(2, Link(2, Link(2, Link(3))))))
     """
     "*** YOUR CODE HERE ***"
-
+    if s is Link.empty:
+        return Link.empty
+    
+    while s != Link.empty:
+        if s.first == val:
+            new_node = Link(val, s.rest)
+            s.rest = new_node
+            s = s.rest.rest
+        else:
+            s = s.rest
+        
 
 class Link:
     """A linked list.

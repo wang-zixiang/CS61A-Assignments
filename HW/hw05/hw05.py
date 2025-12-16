@@ -10,6 +10,20 @@ def hailstone(n):
     1
     """
     "*** YOUR CODE HERE ***"
+    yield n
+
+    while n != 1:
+        if n % 2 == 0:
+            n = n // 2
+        elif n % 2 == 1 and n != 1:
+            n = n * 3 + 1
+        yield n
+    
+    while True:
+        yield 1
+                
+    
+    
 
 
 def merge(a, b):
@@ -31,10 +45,16 @@ def merge(a, b):
     while True:
         if a_val == b_val:
             "*** YOUR CODE HERE ***"
+            yield a_val
+            a_val, b_val = next(a), next(b)
         elif a_val < b_val:
             "*** YOUR CODE HERE ***"
+            yield a_val
+            a_val = next(a)
         else:
             "*** YOUR CODE HERE ***"
+            yield b_val
+            b_val = next(b)
 
 
 def stair_ways(n):
@@ -51,6 +71,21 @@ def stair_ways(n):
     []
     """
     "*** YOUR CODE HERE ***"
+    if n == 0:
+        yield []
+
+    elif n > 0:
+
+        for way in stair_ways(n - 1):
+            yield way + [1]
+
+        if n >= 2:
+            for way in  stair_ways(n - 2):
+                yield way + [2]
+
+
+    # todo(wzx):你担心这种写法把结果强行分成了“只能加 1 的一堆”和“只能加 2 的一堆”，导致像 [1, 2] 这种既有 1 又有 2 的混合情况会被漏掉。
+
 
 
 def yield_paths(t, value):
@@ -89,10 +124,10 @@ def yield_paths(t, value):
     [[0, 2], [0, 2, 1, 2]]
     """
     if label(t) == value:
-        yield ____
-    for b in branches(t):
-        for ____ in ____:
-            yield ____
+        yield [label(t)]
+    for b in branches(t):#找到所有子节点
+        for path in yield_paths(b, value):#找到所有的子节点的路径
+            yield [label(t)] + path
 
 
 
